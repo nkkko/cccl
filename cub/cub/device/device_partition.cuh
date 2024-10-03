@@ -455,12 +455,12 @@ private:
     SecondOutputIteratorT d_second_part_out,
     UnselectedOutputIteratorT d_unselected_out,
     NumSelectedIteratorT d_num_selected_out,
-    int num_items,
+    ::cuda::std::int64_t num_items,
     SelectFirstPartOp select_first_part_op,
     SelectSecondPartOp select_second_part_op,
     cudaStream_t stream = 0)
   {
-    using OffsetT                      = int;
+    using OffsetT                      = ::cuda::std::int64_t;
     using DispatchThreeWayPartitionIfT = DispatchThreeWayPartitionIf<
       InputIteratorT,
       FirstOutputIteratorT,
@@ -680,7 +680,7 @@ public:
      SecondOutputIteratorT d_second_part_out,
      UnselectedOutputIteratorT d_unselected_out,
      NumSelectedIteratorT d_num_selected_out,
-     int num_items,
+     ::cuda::std::int64_t num_items,
      SelectFirstPartOp select_first_part_op,
      SelectSecondPartOp select_second_part_op,
      cudaStream_t stream = 0)
@@ -716,7 +716,7 @@ public:
      SecondOutputIteratorT d_second_part_out,
      UnselectedOutputIteratorT d_unselected_out,
      NumSelectedIteratorT d_num_selected_out,
-     int num_items,
+     ::cuda::std::int64_t num_items,
      SelectFirstPartOp select_first_part_op,
      SelectSecondPartOp select_second_part_op,
      cudaStream_t stream,
