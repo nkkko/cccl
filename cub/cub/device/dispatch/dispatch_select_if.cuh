@@ -349,7 +349,7 @@ __launch_bounds__(int(
     EqualityOpT equality_op,
     OffsetT num_items,
     int num_tiles,
-    _CUB_GRID_CONSTANT const StreamingContextT streaming_context,
+    _CCCL_GRID_CONSTANT const StreamingContextT streaming_context,
     cub::detail::vsmem_t vsmem)
 {
   using VsmemHelperT = cub::detail::vsmem_helper_default_fallback_policy_t<
