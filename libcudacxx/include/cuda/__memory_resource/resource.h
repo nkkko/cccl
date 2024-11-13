@@ -83,7 +83,7 @@ _LIBCUDACXX_CONCEPT async_resource = _LIBCUDACXX_REQUIRES_EXPR(
 //! @tparam _Properties
 template <class _Resource, class... _Properties>
 _LIBCUDACXX_CONCEPT resource_with =
-#    if _CCCL_COMPILER(NVHPC)
+#    if _CCCL_COMPILER(NVHPC) || defined(_CCCL_CUDA_COMPILER_NVCC)
   resource<_Resource> && _CUDA_VSTD::__fold_and_v<__has_property_impl<_Resource, _Properties>::value...>;
 #    else // ^^^ _CCCL_COMPILER(NVHPC) ^^^ / vvv !_CCCL_COMPILER(NVHPC) vvv
   resource<_Resource> && _CUDA_VSTD::__fold_and_v<has_property<_Resource, _Properties>...>;
@@ -95,9 +95,9 @@ _LIBCUDACXX_CONCEPT resource_with =
 //! @tparam _Properties
 template <class _Resource, class... _Properties>
 _LIBCUDACXX_CONCEPT async_resource_with =
-#    if _CCCL_COMPILER(NVHPC)
+#    if _CCCL_COMPILER(NVHPC) || defined(_CCCL_CUDA_COMPILER_NVCC)
   async_resource<_Resource> && _CUDA_VSTD::__fold_and_v<__has_property_impl<_Resource, _Properties>::value...>;
-#    else // ^^^ _CCCL_COMPILER(NVHPC) ^^^ / vvv !_CCCL_COMPILER(NVHPC) vvv
+#    else // ^^^ _CCCL_COMPILER(NVHPC) || ^^^ / vvv !_CCCL_COMPILER(NVHPC) vvv
   async_resource<_Resource> && _CUDA_VSTD::__fold_and_v<has_property<_Resource, _Properties>...>;
 #    endif // !_CCCL_COMPILER(NVHPC)
 
