@@ -90,6 +90,11 @@ inline thread_local Counts* test_fixture_::counts_ = nullptr;
 template <class>
 using test_fixture = test_fixture_;
 
+struct get_data
+{
+  using value_type = int;
+};
+
 template <class T>
 struct test_resource
 {
@@ -126,6 +131,14 @@ struct test_resource
   ~test_resource()
   {
     --fixture->counts.object_count;
+  }
+
+  test_resource& operator=(test_resource other) noexcept
+  {
+    other._assert_valid();
+    ::cuda::std::swap(data, other.data);
+    ::cuda::std::swap(fixture, other.fixture);
+    return *this;
   }
 
   void* allocate(std::size_t bytes, std::size_t align)
@@ -199,6 +212,10 @@ struct test_resource
   }
 
   friend constexpr void get_property(const test_resource&, cuda::mr::host_accessible) noexcept {}
+  friend constexpr int get_property(const test_resource& self, get_data) noexcept
+  {
+    return self.data;
+  }
 };
 
 using big_resource   = test_resource<uintptr_t>;
