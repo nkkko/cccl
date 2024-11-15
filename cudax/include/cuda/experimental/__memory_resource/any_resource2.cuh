@@ -47,13 +47,12 @@
 
 namespace cuda::experimental::mr
 {
-using __property_value_or_void _CCCL_NODEBUG_ALIAS = //
-  _CUDA_VSTD::__type_try_catch< //
-    _CUDA_VSTD::__type_indirect_quote<__property_value_t>, // try to get the property value
-    _CUDA_VSTD::__type_always<void>>; // if it fails, return void
-
 template <class _Property>
-using __property_result_t _CCCL_NODEBUG_ALIAS = _CUDA_VSTD::__type_call1<__property_value_or_void, _Property>;
+using __property_result_t _CCCL_NODEBUG_ALIAS = _CUDA_VSTD::__type_call1< //
+  _CUDA_VSTD::conditional_t<cuda::property_with_value<_Property>,
+                            _CUDA_VSTD::__type_quote1<__property_value_t>,
+                            _CUDA_VSTD::__type_always<void>>,
+  _Property>;
 
 template <class _Property>
 struct __with_property
