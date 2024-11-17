@@ -66,6 +66,10 @@ struct __with_property
     {
       return get_property(__obj, __prop);
     }
+    else
+    {
+      return void();
+    }
   }
 
   template <class...>
@@ -77,6 +81,10 @@ struct __with_property
       if constexpr (!_CUDA_VSTD::is_same_v<__property_result_t<_Property>, void>)
       {
         return __cudax::virtcall<&__get_property<__iproperty>>(&__obj, __prop);
+      }
+      else
+      {
+        return void();
       }
     }
 
