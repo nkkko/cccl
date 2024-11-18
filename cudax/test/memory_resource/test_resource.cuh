@@ -2,6 +2,10 @@
 
 #include <cuda_runtime_api.h>
 
+#include <cuda/stream_ref>
+
+#include <cuda/experimental/__memory_resource/any_resource.cuh>
+
 #include <cstddef>
 #include <cstdint>
 
@@ -221,5 +225,5 @@ struct test_resource
 using big_resource   = test_resource<uintptr_t>;
 using small_resource = test_resource<unsigned int>;
 
-static_assert(sizeof(big_resource) > sizeof(cuda::mr::_AnyResourceStorage));
-static_assert(sizeof(small_resource) <= sizeof(cuda::mr::_AnyResourceStorage));
+static_assert(sizeof(big_resource) > cuda::experimental::__default_buffer_size);
+static_assert(sizeof(small_resource) <= cuda::experimental::__default_buffer_size);

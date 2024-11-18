@@ -18,7 +18,7 @@ TEMPLATE_TEST_CASE_METHOD(test_fixture, "any_async_resource", "[container][resou
 {
   using TestResource = TestType;
   static_assert(cuda::mr::resource_with<TestResource, cuda::mr::host_accessible>);
-  constexpr bool is_big = sizeof(TestResource) > sizeof(cuda::mr::_AnyResourceStorage);
+  constexpr bool is_big = sizeof(TestResource) > cudax::__default_buffer_size;
 
   SECTION("construct and destruct")
   {
@@ -141,7 +141,7 @@ TEMPLATE_TEST_CASE_METHOD(test_fixture, "any_async_resource", "[container][resou
       ++expected.move_count;
       CHECK(this->counts == expected);
 
-      cuda::mr::resource_ref<cuda::mr::host_accessible> ref = mr;
+      cudax::mr::resource_ref<cuda::mr::host_accessible> ref = mr;
 
       CHECK(this->counts == expected);
       auto* ptr = ref.allocate(bytes(100), align(8));

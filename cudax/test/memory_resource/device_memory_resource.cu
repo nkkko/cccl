@@ -428,7 +428,7 @@ TEST_CASE("device_memory_resource comparison", "[memory_resource]")
 
   { // comparison against a device_memory_resource wrapped inside a resource_ref<device_accessible>
     cuda::experimental::mr::device_memory_resource second{};
-    cuda::mr::resource_ref<cuda::mr::device_accessible> second_ref{second};
+    cuda::experimental::mr::resource_ref<cuda::mr::device_accessible> second_ref{second};
     CHECK(first == second_ref);
     CHECK(!(first != second_ref));
     CHECK(second_ref == first);
@@ -437,7 +437,7 @@ TEST_CASE("device_memory_resource comparison", "[memory_resource]")
 
   { // comparison against a device_memory_resource wrapped inside a async_resource_ref
     cuda::experimental::mr::device_memory_resource second{};
-    cuda::mr::async_resource_ref<cuda::mr::device_accessible> second_ref{second};
+    cuda::experimental::mr::async_resource_ref<cuda::mr::device_accessible> second_ref{second};
 
     CHECK(first == second_ref);
     CHECK(!(first != second_ref));

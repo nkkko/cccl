@@ -101,10 +101,11 @@ TEMPLATE_TEST_CASE_METHOD(test_fixture, "shared_resource", "[container][resource
     Counts expected{};
     {
       cudax::mr::shared_resource<TestResource> mr{42, this};
+      static_assert(cudax::__satisfies<TestResource, cudax::mr::__iresource<cuda::mr::host_accessible>>);
       ++expected.object_count;
       CHECK(this->counts == expected);
 
-      cuda::mr::resource_ref<cuda::mr::host_accessible> ref = mr;
+      cudax::mr::resource_ref<cuda::mr::host_accessible> ref = mr;
 
       CHECK(this->counts == expected);
       auto* ptr = ref.allocate(bytes(100), align(8));

@@ -31,7 +31,6 @@
 
 #  include <cuda/__memory_resource/get_property.h>
 #  include <cuda/__memory_resource/properties.h>
-#  include <cuda/__memory_resource/resource_ref.h>
 #  include <cuda/std/__concepts/__concept_macros.h>
 #  include <cuda/std/__cuda/api_wrapper.h>
 #  include <cuda/std/__new_>
@@ -39,6 +38,7 @@
 #  include <cuda/stream_ref>
 
 #  include <cuda/experimental/__device/device_ref.cuh>
+#  include <cuda/experimental/__memory_resource/any_resource.cuh>
 #  include <cuda/experimental/__memory_resource/device_memory_pool.cuh>
 #  include <cuda/experimental/__stream/stream.cuh>
 
@@ -321,8 +321,8 @@ public:
   {
     if constexpr (has_property<_Resource, _CUDA_VMR::device_accessible>)
     {
-      return _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource*>(this)}
-          == _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
+      return resource_ref<_CUDA_VMR::device_accessible>{*const_cast<device_memory_resource*>(this)}
+          == resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
     }
     else
     {
@@ -335,8 +335,8 @@ public:
     _LIBCUDACXX_TRAILING_REQUIRES(bool)(_CUDA_VMR::__different_resource<device_memory_resource, _Resource>&&
                                           has_property<_Resource, _CUDA_VMR::device_accessible>)
   {
-    return _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
-        == _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
+    return resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
+        == resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
   }
 
   template <class _Resource>
@@ -352,8 +352,8 @@ public:
     _LIBCUDACXX_TRAILING_REQUIRES(bool)(_CUDA_VMR::__different_resource<device_memory_resource, _Resource>&&
                                           has_property<_Resource, _CUDA_VMR::device_accessible>)
   {
-    return _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
-        == _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
+    return resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
+        == resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
   }
 
   template <class _Resource>
@@ -369,8 +369,8 @@ public:
     _LIBCUDACXX_TRAILING_REQUIRES(bool)(_CUDA_VMR::__different_resource<device_memory_resource, _Resource>&&
                                           has_property<_Resource, _CUDA_VMR::device_accessible>)
   {
-    return _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
-        != _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
+    return resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
+        != resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
   }
 
   template <class _Resource>
@@ -386,8 +386,8 @@ public:
     _LIBCUDACXX_TRAILING_REQUIRES(bool)(_CUDA_VMR::__different_resource<device_memory_resource, _Resource>&&
                                           has_property<_Resource, _CUDA_VMR::device_accessible>)
   {
-    return _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
-        != _CUDA_VMR::resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
+    return resource_ref<_CUDA_VMR::device_accessible>{const_cast<device_memory_resource&>(__lhs)}
+        != resource_ref<_CUDA_VMR::device_accessible>{const_cast<_Resource&>(__rhs)};
   }
 
   template <class _Resource>
