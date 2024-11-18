@@ -89,7 +89,7 @@ struct __with_property
     }
 
     template <class _Ty>
-    using overrides _CCCL_NODEBUG_ALIAS = overrides_for<_Ty, &__get_property<_Ty>>;
+    using overrides _CCCL_NODEBUG_ALIAS = overrides_for<_Ty, _CUDAX_FNPTR_CONSTANT_WAR(&__get_property<_Ty>)>;
   };
 };
 
@@ -124,7 +124,11 @@ struct __ibasic_resource : interface<__ibasic_resource, extends<icopyable<>, ieq
 
   template <class _Ty>
   using overrides _CCCL_NODEBUG_ALIAS =
-    overrides_for<_Ty, &_Ty::allocate, &_Ty::deallocate, &_Ty::allocate_async, &_Ty::deallocate_async>;
+    overrides_for<_Ty,
+                  _CUDAX_FNPTR_CONSTANT_WAR(&_Ty::allocate),
+                  _CUDAX_FNPTR_CONSTANT_WAR(&_Ty::deallocate),
+                  _CUDAX_FNPTR_CONSTANT_WAR(&_Ty::allocate_async),
+                  _CUDAX_FNPTR_CONSTANT_WAR(&_Ty::deallocate_async)>;
 };
 
 template <class... _Properties>
