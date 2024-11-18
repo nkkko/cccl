@@ -41,33 +41,9 @@ _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 //!    get_property(const Resource& res, Property prop);
 //!
 //! @endrst
-template <class _Resource, class _Property, class = void>
-_CCCL_INLINE_VAR constexpr bool has_property = false;
-
 template <class _Resource, class _Property>
-_CCCL_INLINE_VAR constexpr bool has_property<
-  _Resource,
-  _Property,
-  _CUDA_VSTD::void_t<decltype(get_property(_CUDA_VSTD::declval<const _Resource&>(), _CUDA_VSTD::declval<_Property>()))>> =
-  true;
-
-// NVHPC and NVCC have issues accepting this at compile time if it is in a variable template
-#    if _CCCL_COMPILER(NVHPC) || defined(_CCCL_CUDA_COMPILER_NVCC)
-template <class _Resource, class _Property, class = void>
-struct __has_property_impl
-{
-  static constexpr bool value = false;
-};
-
-template <class _Resource, class _Property>
-struct __has_property_impl<
-  _Resource,
-  _Property,
-  _CUDA_VSTD::void_t<decltype(get_property(_CUDA_VSTD::declval<const _Resource&>(), _CUDA_VSTD::declval<_Property>()))>>
-{
-  static constexpr bool value = true;
-};
-#    endif // _CCCL_COMPILER(NVHPC) || _CCCL_CUDA_COMPILER_NVCC
+_LIBCUDACXX_CONCEPT has_property = _LIBCUDACXX_REQUIRES_EXPR(
+  (_Resource, _Property), const _Resource& __res, _Property __prop)(typename(decltype(get_property(__res, __prop))));
 
 template <class _Property>
 using __property_value_t = typename _Property::value_type;
@@ -84,12 +60,9 @@ using __property_value_t = typename _Property::value_type;
 //!    static_assert(!cuda::property_with_value<stateful_property>);
 //!
 //! @endrst
-template <class _Property, class = void>
-_CCCL_INLINE_VAR constexpr bool property_with_value = false;
-
 template <class _Property>
-_CCCL_INLINE_VAR constexpr bool property_with_value<_Property, _CUDA_VSTD::void_t<__property_value_t<_Property>>> =
-  true;
+_LIBCUDACXX_CONCEPT property_with_value =
+  _LIBCUDACXX_REQUIRES_EXPR((_Property))(typename(__property_value_t<_Property>));
 
 //! @brief The \c has_property_with concept verifies that a Resource satisfies a given stateful Property
 //! @rst
@@ -120,12 +93,10 @@ _CCCL_INLINE_VAR constexpr bool property_with_value<_Property, _CUDA_VSTD::void_
 //!
 //! @endrst
 template <class _Resource, class _Property, class _Return>
-_LIBCUDACXX_CONCEPT_FRAGMENT(
-  __has_property_with_,
-  requires(const _Resource& __res)(requires(property_with_value<_Property>),
-                                   requires(_CUDA_VSTD::same_as<_Return, decltype(get_property(__res, _Property{}))>)));
-template <class _Resource, class _Property, class _Return>
-_LIBCUDACXX_CONCEPT has_property_with = _LIBCUDACXX_FRAGMENT(__has_property_with_, _Resource, _Property, _Return);
+_LIBCUDACXX_CONCEPT has_property_with =
+  _LIBCUDACXX_REQUIRES_EXPR((_Resource, _Property, _Return), const _Resource& __res, _Property __prop)(
+    requires(property_with_value<_Property>),
+    requires(_CUDA_VSTD::same_as<_Return, decltype(get_property(__res, __prop))>));
 
 template <class _Resource, class _Upstream>
 _LIBCUDACXX_CONCEPT_FRAGMENT(
