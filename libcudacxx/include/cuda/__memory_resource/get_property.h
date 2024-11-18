@@ -43,7 +43,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 //! @endrst
 template <class _Resource, class _Property>
 _LIBCUDACXX_CONCEPT has_property = _LIBCUDACXX_REQUIRES_EXPR(
-  (_Resource, _Property), const _Resource& __res, _Property __prop)(typename(decltype(get_property(__res, __prop))));
+  (_Resource, _Property), const _Resource& __res, _Property __prop)(get_property(__res, __prop));
 
 template <class _Property>
 using __property_value_t = typename _Property::value_type;
