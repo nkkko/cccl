@@ -76,8 +76,8 @@ struct __with_property
   template <class...>
   struct __iproperty : interface<__iproperty>
   {
-    _CUDAX_API friend auto get_property([[maybe_unused]] const __iproperty& __obj,
-                                        [[maybe_unused]] _Property __prop) -> __property_result_t<_Property>
+    _CUDAX_HOST_API friend auto get_property([[maybe_unused]] const __iproperty& __obj,
+                                             [[maybe_unused]] _Property __prop) -> __property_result_t<_Property>
     {
       if constexpr (!_CUDA_VSTD::is_same_v<__property_result_t<_Property>, void>)
       {
