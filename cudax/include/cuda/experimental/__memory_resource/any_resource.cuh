@@ -60,10 +60,9 @@ template <class _Property>
 struct __with_property
 {
   template <class _Ty>
-  _CUDAX_PUBLIC_API static auto __get_property(const _Ty& __obj, _Property __prop) noexcept //
+  _CUDAX_PUBLIC_API static auto __get_property(const _Ty& __obj, _Property __prop) //
     -> __property_result_t<_Property>
   {
-    static_assert(noexcept(get_property(__obj, __prop)));
     if constexpr (!_CUDA_VSTD::is_same_v<__property_result_t<_Property>, void>)
     {
       return get_property(__obj, __prop);
@@ -78,7 +77,7 @@ struct __with_property
   struct __iproperty : interface<__iproperty>
   {
     _CUDAX_API friend auto get_property([[maybe_unused]] const __iproperty& __obj,
-                                        [[maybe_unused]] _Property __prop) noexcept -> __property_result_t<_Property>
+                                        [[maybe_unused]] _Property __prop) -> __property_result_t<_Property>
     {
       if constexpr (!_CUDA_VSTD::is_same_v<__property_result_t<_Property>, void>)
       {
@@ -142,9 +141,21 @@ struct __ibasic_async_resource : interface<__ibasic_async_resource>
     return __cudax::virtcall<&__allocate_async<__ibasic_async_resource>>(this, __bytes, __alignment, __stream);
   }
 
+  _CUDAX_PUBLIC_API void* allocate_async(size_t __bytes, ::cuda::stream_ref __stream)
+  {
+    return __cudax::virtcall<&__allocate_async<__ibasic_async_resource>>(
+      this, __bytes, alignof(_CUDA_VSTD::max_align_t), __stream);
+  }
+
   _CUDAX_PUBLIC_API void deallocate_async(void* __pv, size_t __bytes, size_t __alignment, ::cuda::stream_ref __stream)
   {
     return __cudax::virtcall<&__deallocate_async<__ibasic_async_resource>>(this, __pv, __bytes, __alignment, __stream);
+  }
+
+  _CUDAX_PUBLIC_API void deallocate_async(void* __pv, size_t __bytes, ::cuda::stream_ref __stream)
+  {
+    return __cudax::virtcall<&__deallocate_async<__ibasic_async_resource>>(
+      this, __pv, __bytes, alignof(_CUDA_VSTD::max_align_t), __stream);
   }
 
   template <class _Ty>
