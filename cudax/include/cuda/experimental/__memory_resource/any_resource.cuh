@@ -167,7 +167,7 @@ struct __ibasic_async_resource : interface<__ibasic_async_resource>
 };
 
 template <class _Resource>
-_CUDAX_HOST_API const _CUDA_VMR::_Alloc_vtable* __get_resource_vptr(_Resource& __mr) noexcept
+_CUDAX_PUBLIC_API const _CUDA_VMR::_Alloc_vtable* __get_resource_vptr(_Resource&) noexcept
 {
   if constexpr (_CUDA_VMR::resource<_Resource>)
   {
@@ -182,12 +182,17 @@ _CUDAX_HOST_API const _CUDA_VMR::_Alloc_vtable* __get_resource_vptr(_Resource& _
   }
 }
 
+_CCCL_DIAG_PUSH
+_CCCL_DIAG_SUPPRESS_GCC("-Wunused-but-set-parameter")
+
 template <class _VPtr, class... _Properties>
 _CUDAX_HOST_API auto __make_resource_vtable(_VPtr __vptr, _CUDA_VMR::_Resource_vtable<_Properties...>*) noexcept
   -> _CUDA_VMR::_Resource_vtable<_Properties...>
 {
   return {__vptr->__query_interface(__iproperty<_Properties>())->__fn_...};
 }
+
+_CCCL_DIAG_POP
 
 template <class... _Super>
 struct _LIBCUDACXX_DECLSPEC_EMPTY_BASES __iresource_ref_conversions
