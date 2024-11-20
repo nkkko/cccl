@@ -164,8 +164,10 @@ public:
   /// `icopyable<>`.
   /// \post `has_value() == __other.has_value()`.
   _LIBCUDACXX_TEMPLATE(class _OtherInterface)
-  _LIBCUDACXX_REQUIRES((!_CUDA_VSTD::same_as<_OtherInterface, _Interface>)
-                         _LIBCUDACXX_AND __any_convertible_to<basic_any<_OtherInterface> const&, basic_any>)
+  _LIBCUDACXX_REQUIRES(
+    (!_CUDA_VSTD::same_as<_OtherInterface, _Interface>) ) //_LIBCUDACXX_AND
+                                                          //__any_convertible_to<basic_any<_OtherInterface>
+                                                          // const&, basic_any>)
   _CUDAX_HOST_API basic_any(basic_any<_OtherInterface> const& __other)
   {
     __convert_from(__other);

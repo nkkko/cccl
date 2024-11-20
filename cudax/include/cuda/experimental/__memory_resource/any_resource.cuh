@@ -39,6 +39,7 @@
 #include <cuda/__memory_resource/get_property.h>
 #include <cuda/__memory_resource/properties.h>
 #include <cuda/__memory_resource/resource.h>
+#include <cuda/__memory_resource/resource_ref.h>
 #include <cuda/std/__concepts/__concept_macros.h>
 #include <cuda/std/__utility/forward.h>
 #include <cuda/std/optional>
@@ -60,12 +61,12 @@ template <class _Property>
 struct __with_property
 {
   template <class _Ty>
-  _CUDAX_PUBLIC_API static auto __get_property(const _Ty& __obj, _Property __prop) //
+  _CUDAX_PUBLIC_API static auto __get_property(const _Ty& __obj) //
     -> __property_result_t<_Property>
   {
     if constexpr (!_CUDA_VSTD::is_same_v<__property_result_t<_Property>, void>)
     {
-      return get_property(__obj, __prop);
+      return get_property(__obj, _Property());
     }
     else
     {
@@ -76,12 +77,12 @@ struct __with_property
   template <class...>
   struct __iproperty : interface<__iproperty>
   {
-    _CUDAX_HOST_API friend auto get_property([[maybe_unused]] const __iproperty& __obj,
-                                             [[maybe_unused]] _Property __prop) -> __property_result_t<_Property>
+    _CUDAX_HOST_API friend auto
+    get_property([[maybe_unused]] const __iproperty& __obj, _Property) -> __property_result_t<_Property>
     {
       if constexpr (!_CUDA_VSTD::is_same_v<__property_result_t<_Property>, void>)
       {
-        return __cudax::virtcall<&__get_property<__iproperty>>(&__obj, __prop);
+        return __cudax::virtcall<&__get_property<__iproperty>>(&__obj);
       }
       else
       {
@@ -165,17 +166,66 @@ struct __ibasic_async_resource : interface<__ibasic_async_resource>
                   _CUDAX_FNPTR_CONSTANT_WAR(&__deallocate_async<_Ty>)>;
 };
 
-template <class... _Properties>
-using __iresource _CCCL_NODEBUG_ALIAS =
-  iset<__ibasic_resource<>, icopyable<>, iequality_comparable<>, __iproperty_set<_Properties...>>;
+template <class _Resource>
+_CUDAX_HOST_API const _CUDA_VMR::_Alloc_vtable* __get_resource_vptr(_Resource& __mr) noexcept
+{
+  if constexpr (_CUDA_VMR::resource<_Resource>)
+  {
+    return &_CUDA_VMR::__alloc_vtable<_CUDA_VMR::_AllocType::_Default, _CUDA_VMR::_WrapperType::_Reference, _Resource>;
+  }
+  else
+  {
+    // This branch is taken when called from the thunk of an unspecialized
+    // interface; e.g., `icat<>` rather than `icat<ialley_cat<>>`. The thunks of
+    // unspecialized interfaces are never called, they just need to exist.
+    _CCCL_UNREACHABLE();
+  }
+}
+
+template <class _VPtr, class... _Properties>
+_CUDAX_HOST_API auto __make_resource_vtable(_VPtr __vptr, _CUDA_VMR::_Resource_vtable<_Properties...>*) noexcept
+  -> _CUDA_VMR::_Resource_vtable<_Properties...>
+{
+  return {__vptr->__query_interface(__iproperty<_Properties>())->__fn_...};
+}
+
+template <class... _Super>
+struct _LIBCUDACXX_DECLSPEC_EMPTY_BASES __iresource_ref_conversions
+    : interface<__iresource_ref_conversions>
+    , _CUDA_VMR::_Resource_ref_base
+{
+  using __basic_any_type =
+    _CUDA_VSTD::decay_t<decltype(__cudax::basic_any_from(declval<__iresource_ref_conversions&>()))>;
+
+  template <class _Property>
+  using __iprop = __rebind_interface<__iproperty<_Property>, _Super...>;
+
+  _LIBCUDACXX_TEMPLATE(class... _Properties)
+  _LIBCUDACXX_REQUIRES((std::derived_from<__basic_any_type, __iprop<_Properties>> && ...))
+  operator _CUDA_VMR::resource_ref<_Properties...>()
+  {
+    _CUDA_VMR::_Filtered_vtable<_Properties...>* __prop_vtable = nullptr;
+    auto& __self                                               = __cudax::basic_any_from(*this);
+    return _CUDA_VMR::_Resource_ref_helper::_Construct<_CUDA_VMR::_AllocType::_Default, _Properties...>(
+      __basic_any_access::__get_optr(__self),
+      __cudax::virtcall<&__get_resource_vptr<__iresource_ref_conversions>>(this),
+      __cudax::mr::__make_resource_vtable(__basic_any_access::__get_vptr(__self), __prop_vtable));
+  }
+
+  template <class _Resource>
+  using overrides = overrides_for<_Resource, _CUDAX_FNPTR_CONSTANT_WAR(&__get_resource_vptr<_Resource>)>;
+};
 
 template <class... _Properties>
-using __iasync_resource _CCCL_NODEBUG_ALIAS =
+using __iresource _CCCL_NODEBUG_ALIAS =
   iset<__ibasic_resource<>,
-       __ibasic_async_resource<>,
+       __iproperty_set<_Properties...>,
+       __iresource_ref_conversions<>,
        icopyable<>,
-       iequality_comparable<>,
-       __iproperty_set<_Properties...>>;
+       iequality_comparable<>>;
+
+template <class... _Properties>
+using __iasync_resource _CCCL_NODEBUG_ALIAS = iset<__iresource<_Properties...>, __ibasic_async_resource<>>;
 
 template <class _Property>
 using __try_property_result_t =
