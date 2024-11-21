@@ -358,7 +358,7 @@ public:
     return task(default_exec_place(), mv(deps)...);
   }
 
-#if defined(CUDASTF_CODE_GENERATION) && defined(__CUDACC__)
+#if !defined(CUDASTF_DISABLE_CODE_GENERATION) && defined(__CUDACC__)
   /*
    * parallel_for : apply an operation over a shaped index space
    */
@@ -393,7 +393,7 @@ public:
   {
     return parallel_for(default_exec_place(), mv(shape), mv(deps)...);
   }
-#endif // defined(CUDASTF_CODE_GENERATION) && defined(__CUDACC__)
+#endif // !defined(CUDASTF_DISABLE_CODE_GENERATION) && defined(__CUDACC__)
 
   template <typename... Deps>
   auto host_launch(task_dep<Deps>... deps)
@@ -464,7 +464,7 @@ public:
       payload);
   }
 
-#if defined(CUDASTF_CODE_GENERATION) && defined(__CUDACC__)
+#if !defined(CUDASTF_DISABLE_CODE_GENERATION) && defined(__CUDACC__)
   template <typename thread_hierarchy_spec_t, typename... Deps>
   auto launch(thread_hierarchy_spec_t spec, exec_place e_place, task_dep<Deps>... deps)
   {
@@ -498,7 +498,7 @@ public:
   {
     return launch(mv(ths), default_exec_place(), mv(deps)...);
   }
-#endif // defined(CUDASTF_CODE_GENERATION) && defined(__CUDACC__)
+#endif // !defined(CUDASTF_DISABLE_CODE_GENERATION) && defined(__CUDACC__)
 
   auto repeat(size_t count)
   {
@@ -787,7 +787,7 @@ UNITTEST("context with arguments")
   cuda_safe_call(cudaStreamDestroy(stream));
 };
 
-#  if defined(CUDASTF_CODE_GENERATION) && defined(__CUDACC__)
+#  if !defined(CUDASTF_DISABLE_CODE_GENERATION) && defined(__CUDACC__)
 namespace reserved
 {
 inline void unit_test_context_pfor()
@@ -1236,7 +1236,7 @@ UNITTEST("unit_test_partitioner_product")
 };
 
 } // namespace reserved
-#  endif // defined(CUDASTF_CODE_GENERATION) && defined(__CUDACC__)
+#  endif // !defined(CUDASTF_DISABLE_CODE_GENERATION) && defined(__CUDACC__)
 
 UNITTEST("make_tuple_indexwise")
 {
